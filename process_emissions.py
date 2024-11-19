@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pooch
+import pickle
 
 # This creates the emissions which go into FRIDA, and the Climate Calibration
 # FRIDA emissions are from 1980; calibration from 1750; both end 2022
@@ -452,5 +453,13 @@ for spec in ['CO2', 'N2O', 'CH4', 'SO2']:
     plt.title(spec)    
     plt.legend()
     plt.xlim([1950, 2024])
+
+
+#%%
+
+df_frida.to_csv('data/outputs/frida_data.csv')
+df_climate.to_csv('data/outputs/calibration_data.csv')
+with open('data/outputs/baseline_emissions.pkl', 'wb') as handle:
+    pickle.dump(df_frida_baselines, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
