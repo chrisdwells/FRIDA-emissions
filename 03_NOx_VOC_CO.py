@@ -13,9 +13,8 @@ import os
 
 load_dotenv()
 
-# This makes the NOx, VOC, CO timeseries used to drive the climate calibration
-# and for the FRIDA calibration. It also makes the regression coefficients used
-# in both. 
+# This makes the NOx, VOC, CO timeseries used for the FRIDA calibration. CEDS + GFED.
+# It also makes the regression coefficients used in both. 
 
 climate_start = int(os.getenv("climate_start"))
 climate_end = int(os.getenv("climate_end"))
@@ -362,7 +361,6 @@ regr_data = {}
 potential_links = {
     'BC Snow Forcing':['CO2 AFOLU Emissions', 'Sulfur Emissions'],
     'VOC Emissions':['CH4 Emissions'],
-    # 'NOx Emissions':['N2O Emissions'],
     'CO Emissions':['CH4 Emissions'],
     'NOx non AFOLU Emissions':['N2O non AFOLU Emissions'],
     'NOx AFOLU Emissions':['Sulfur Emissions'],
@@ -389,10 +387,11 @@ for targ in potential_links.keys():
     
     fig = plt.figure()
     
-    plt.plot(np.arange(climate_start, climate_end+1), regression_data[targ].values)
+    plt.plot(np.arange(climate_start, climate_end+1), regression_data[targ].values, label='Target')
     plt.plot(np.arange(climate_start, climate_end+1), regression_data[targ].values[0
-               ] + regr.predict(pred_array))
+               ] + regr.predict(pred_array), label='Fit')
 
+    plt.legend()
     plt.title(targ)
     
 #%%

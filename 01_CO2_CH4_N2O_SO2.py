@@ -373,7 +373,7 @@ df_climate['Emissions.Total CH4 Emissions'] = ch4_for_climate + ch4_gfed_mean
 
 df_frida_baselines['Emissions.CH4 Baseline Emissions'] = df_climate.loc[df_climate.index==1750]['Emissions.Total CH4 Emissions'].values[0]
 
-df_frida_baselines['CH4 Forcing.Atmospheric N2O Concentration 1750'
+df_frida_baselines['CH4 Forcing.Atmospheric CH4 Concentration 1750'
            ] = df_indicators['CH4'].loc[df_indicators.index==1750].values[0]
                               
 # Make sure consistent between climate calibration and FRIDA calibration

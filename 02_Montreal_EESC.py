@@ -97,9 +97,6 @@ fill(f_new_hist.climate_configs['ocean_heat_capacity'], capacities)
 fill(f_new_hist.climate_configs['ocean_heat_transfer'], kappas)
 fill(f_new_hist.climate_configs['deep_ocean_efficacy'], epsilon)
 
-f_new_hist.run()
-
-#%%
 
 for spec in montreals:
     conc_in = df_hist_concs[spec]
@@ -107,6 +104,7 @@ for spec in montreals:
     conc_full = np.concatenate((conc_1750_to_1850, conc_in.loc[conc_in.index > 1850]))
     f_new_hist.concentration[:,0,0, f_new_hist.species.index(spec)] = conc_full
     
+f_new_hist.run()
 
 #%%
 
@@ -240,7 +238,7 @@ df_calib = pd.read_csv(
 df_calib['Minor GHGs Forcing.Montreal Gases Effective Radiative Forcing'
          ] = montreal_forcing_hist_future_new[np.where(f_ssps.timebounds<=climate_end)]
 
-df_calib['Minor GHGs Forcing.Montreal gases equivalent effective stratospheric chlorine'
+df_calib['Ozone Forcing.Montreal gases equivalent effective stratospheric chlorine'
          ] = eesc_hist_future_new[np.where(f_ssps.timebounds<=climate_end)]
 
 df_calib.to_csv('data/outputs/climate_calibration_data.csv')
