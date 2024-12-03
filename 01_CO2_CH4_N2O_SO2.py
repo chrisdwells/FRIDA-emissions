@@ -109,7 +109,7 @@ df_gcb_by_cat = pd.read_csv(
 df_gcb_by_cat_crop = df_gcb_by_cat.loc[(df_gcb_by_cat['Year'] >= frida_start
                                     ) & (df_gcb_by_cat['Year'] <= frida_calib_end)]
 
-df_frida['Concrete.CO2 emissions[1]'] = mtc_to_mtco2*df_gcb_by_cat_crop['Cement.emission'].values
+df_frida['Concrete.CO2 Emissions[1]'] = mtc_to_mtco2*df_gcb_by_cat_crop['Cement.emission'].values
 
 df_frida['Emissions.CO2 Emissions from Energy[1]'
          ] = mtc_to_mtco2*(df_gcb_by_cat_crop['fossil.emissions.excluding.carbonation'
@@ -122,7 +122,7 @@ df_frida['Emissions.CO2 Emissions from Food and Land Use[1]'
          ] = gtc_to_mtco2*land_use_frida                                          
 
 # Make sure consistent between climate calibration and FRIDA calibration
-assert df_frida[['Concrete.CO2 emissions[1]', 'Emissions.CO2 Emissions from Energy[1]',
+assert df_frida[['Concrete.CO2 Emissions[1]', 'Emissions.CO2 Emissions from Energy[1]',
        'Emissions.CO2 Emissions from Food and Land Use[1]']].loc[
        df_frida.index == 2015].sum(axis=1).values == df_climate.loc[
        df_climate.index == 2015]['Emissions.CO2 Emissions from Fossil use'
