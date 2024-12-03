@@ -166,13 +166,13 @@ n2o_food_and_lu = df_primap_n2o_frida['3']
 
 
 df_frida['Emissions.N2O Emissions from Food and Land Use[1]'
-         ] = ggn2o_to_ktn2o*n2o_energy.values
+         ] = ggn2o_to_ktn2o*n2o_food_and_lu.values
 
 df_frida['Emissions.N2O Emissions from Other[1]'
          ] = ggn2o_to_ktn2o*n2o_other.values
 
 df_frida['Emissions.N2O Emissions from Energy[1]'
-         ] = ggn2o_to_ktn2o*n2o_food_and_lu.values
+         ] = ggn2o_to_ktn2o*n2o_energy.values
 
 
 df_primap_n2o_climate = df_primap_n2o.loc[(df_primap_n2o.index >= climate_start
@@ -195,11 +195,15 @@ df_frida_baselines['N2O Forcing.Atmospheric N2O Concentration 1750'
            ] = df_indicators['N2O'].loc[df_indicators.index==1750].values[0]
                                                                                    
 # Make sure consistent between climate calibration and FRIDA calibration
-assert df_frida[['Emissions.N2O Emissions from Other[1]', 'Emissions.N2O Emissions from Energy[1]',
+assert np.around(df_frida[['Emissions.N2O Emissions from Other[1]', 'Emissions.N2O Emissions from Energy[1]',
        'Emissions.N2O Emissions from Food and Land Use[1]']].loc[
-       df_frida.index == 2015].sum(axis=1).values == df_climate.loc[
-       df_climate.index == 2015]['Emissions.Total N2O Emissions'].values
+       df_frida.index == 2015].sum(axis=1).values, decimals=3) == np.around(df_climate.loc[
+       df_climate.index == 2015]['Emissions.Total N2O Emissions'].values, decimals=3)
 
+#%%
+
+df_test = df_primap_n2o['0'].loc[(df_primap_n2o.index >= frida_start
+                                    ) & (df_primap_n2o.index <= frida_calib_end)]
 
 #%%
 

@@ -183,8 +183,27 @@ for var in conc_vars.keys():
     df_frida_new[var]['Units'] = conc_vars[var]
     df_frida_new[var]['Reference'] = 'https://github.com/ClimateIndicator/forcing-timeseries/blob/main/output/ghg_concentrations_1750-2023.csv'
 
-    
-    
+  
+#%%
+
+df_gmst = pd.read_csv('data/inputs/IGCC_GMST_1850-2022.csv', index_col=0)
+   
+var = 'Energy Balance Model.Surface Temperature Anomaly[1]'
+df_var = 'gmst'
+
+if var in df_frida_new.keys():
+    df_frida_new = df_frida_new.drop([var], axis=1)
+
+df_frida_new.loc[len(df_frida_new)] = None # this could do with fixing
+
+for idx in df_frida_calib_inputs.index:
+    if str(idx) in df_frida_new.index and type(idx) == int:
+        df_frida_new.loc[str(idx), var] = df_gmst[df_var][idx+0.5]
+
+df_frida_new[var]['Units'] = 'deg C'
+df_frida_new[var]['Reference'] = ''
+
+
 #%%
        
 df_frida_new = df_frida_new.T
