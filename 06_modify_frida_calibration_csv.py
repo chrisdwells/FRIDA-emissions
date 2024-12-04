@@ -186,7 +186,7 @@ for var in conc_vars.keys():
   
 #%%
 
-df_gmst = pd.read_csv('data/inputs/IGCC_GMST_1850-2022.csv', index_col=0)
+df_gmst = pd.read_csv('data/inputs/annual_averages.csv', index_col=0)
    
 var = 'Energy Balance Model.Surface Temperature Anomaly[1]'
 df_var = 'gmst'

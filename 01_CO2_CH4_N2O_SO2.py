@@ -44,9 +44,13 @@ mtc_to_mtco2 = co2_molec_weight/c_molec_weight # gcb
 
 ggn2o_to_ktn2o = 1 # primap
 
+tgn2o_to_ktn2o = 1000 # GFED
+
 ktch4_to_mtch4 = 0.001 # ceds
 
 ggch4_to_mtch4 = 0.001 # primap
+
+tgch4_to_mtch4 = 1 # GFED
 
 ktso2_to_mtso2 = 0.001 # ceds
 
@@ -138,6 +142,9 @@ N2O
 Use PRIMAP-hist data
 Current version: 2024 v2.6 https://zenodo.org/records/13752654
 
+Biomass Burning separately, from GFED 1997plus - averaged due to no process-based 
+representation in FRIDA.
+
 """
 
 df_primap = pd.read_csv(
@@ -185,7 +192,24 @@ df_climate['Emissions.Total N2O Emissions'] = ggn2o_to_ktn2o*(df_primap_n2o_clim
 df_climate['Emissions.N2O non AFOLU Emissions'] = ggn2o_to_ktn2o*(df_primap_n2o_climate['1'
                             ] + df_primap_n2o_climate['2'] + df_primap_n2o_climate['4'
                                ] + df_primap_n2o_climate['5']).values
+               
                                                                                    
+                                                                                   
+# BB GFED
+df_gfed = pd.read_csv(
+    "data/inputs/gfed4.1s_1997-2023.csv")
+
+n2o_gfed_1997_plus = df_gfed['N2O'].loc[
+            df_gfed['Unnamed: 0'] <= climate_end].values
+n2o_gfed_mean = np.mean(n2o_gfed_1997_plus)*tgn2o_to_ktn2o
+
+df_climate['Emissions.Total N2O Emissions'] += n2o_gfed_mean
+
+df_frida['Emissions.N2O Emissions from Food and Land Use[1]'
+         ] += n2o_gfed_mean
+
+
+# baselines
 df_frida_baselines['Emissions.N2O Baseline Emissions'] = df_climate.loc[df_climate.index==1750]['Emissions.Total N2O Emissions'].values[0]
 
 df_frida_baselines['Emissions.Baseline N2O non AFOLU Emissions'] = df_climate.loc[df_climate.index==1750]['Emissions.N2O non AFOLU Emissions'].values[0]
@@ -193,17 +217,14 @@ df_frida_baselines['Emissions.Baseline N2O non AFOLU Emissions'] = df_climate.lo
 # 1750 concentration for FRIDA
 df_frida_baselines['N2O Forcing.Atmospheric N2O Concentration 1750'
            ] = df_indicators['N2O'].loc[df_indicators.index==1750].values[0]
-                                                                                   
+          
+                                                                         
 # Make sure consistent between climate calibration and FRIDA calibration
 assert np.around(df_frida[['Emissions.N2O Emissions from Other[1]', 'Emissions.N2O Emissions from Energy[1]',
        'Emissions.N2O Emissions from Food and Land Use[1]']].loc[
        df_frida.index == 2015].sum(axis=1).values, decimals=3) == np.around(df_climate.loc[
        df_climate.index == 2015]['Emissions.Total N2O Emissions'].values, decimals=3)
 
-#%%
-
-df_test = df_primap_n2o['0'].loc[(df_primap_n2o.index >= frida_start
-                                    ) & (df_primap_n2o.index <= frida_calib_end)]
 
 #%%
 
@@ -301,9 +322,6 @@ for sector in ["Energy", "Food and Land Use", "Other"]:
     df_frida[f'Emissions.CH4 Emissions from {sector}[1]'] = df_sector_sum_frida.values
     
 # BB from GFED - add to land use
-df_gfed = pd.read_csv(
-    "data/inputs/gfed4.1s_1997-2023.csv")
-
 
 rcmip_emissions_file = pooch.retrieve(
     url="doi:10.5281/zenodo.4589756/rcmip-emissions-annual-means-v5-1-0.csv",
@@ -311,7 +329,6 @@ rcmip_emissions_file = pooch.retrieve(
 )
 
 df_emis = pd.read_csv(rcmip_emissions_file)
-
 
 ch4_afolu_pre_1997 = (
     df_emis.loc[
@@ -343,7 +360,7 @@ ch4_agri_pre_1997 = (
 ch4_gfed_pre_1997 = ch4_afolu_pre_1997 - ch4_agri_pre_1997
 
 ch4_gfed_1997_plus = df_gfed['CH4'].loc[
-            df_gfed['Unnamed: 0'] <= climate_end].values
+            df_gfed['Unnamed: 0'] <= climate_end].values*tgch4_to_mtch4
 ch4_gfed = np.concatenate((ch4_gfed_pre_1997, ch4_gfed_1997_plus))
 ch4_gfed_mean = np.mean(ch4_gfed)
 

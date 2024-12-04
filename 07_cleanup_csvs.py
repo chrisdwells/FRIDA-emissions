@@ -16,7 +16,14 @@ df_baseline_values = df_baseline_values.drop(['Unnamed: 0.1', 'Unnamed: 0'], axi
 df_regression_parameters = pd.read_csv("data/outputs/regression_parameters.csv")
 df_regression_parameters = df_regression_parameters.drop(['Index'], axis=1)
 
+df_climate_calibration_data = pd.read_csv("data/outputs/climate_calibration_data.csv")
+df_climate_calibration_data = df_climate_calibration_data.drop(
+    ['Unnamed: 0.1', 'Unnamed: 0'], axis=1)
+
+df_climate_calibration_data = df_climate_calibration_data.set_index('Year')
 #%%
 df_frida_calibration_data.to_csv('data/outputs/frida_calibration_data.csv')
 df_baseline_values.to_csv('data/outputs/baseline_values.csv')
 df_regression_parameters.to_csv('data/outputs/regression_parameters.csv')
+df_climate_calibration_data.to_csv('data/outputs/climate_calibration_data.csv')
+
