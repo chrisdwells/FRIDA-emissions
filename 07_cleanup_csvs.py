@@ -7,7 +7,7 @@ df_frida_calibration_data = pd.read_csv("data/outputs/frida_calibration_data.csv
 df_frida_calibration_data = df_frida_calibration_data.drop(['Unnamed: 0'], axis=1)
 
 df_baseline_values = pd.read_csv("data/outputs/baseline_values.csv")
-df_baseline_values = df_baseline_values.drop(['Unnamed: 0.1', 'Unnamed: 0'], axis=1)
+df_baseline_values = df_baseline_values.drop(['Unnamed: 0.1', 'Unnamed: 0', 'Year'], axis=1)
 
 # df_climate_calibration_data = pd.read_csv("data/outputs/climate_calibration_data.csv")
 
