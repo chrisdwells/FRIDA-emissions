@@ -3,7 +3,17 @@ import copy
 from dotenv import load_dotenv
 import os
 
+# This puts the emissions generated from the prior scripts, and other
+# calibration data (forcings, concentrations), and puts them 
+# into an existing FRIDA calibration data file, with documentation, saving
+# this file in the data ouptut folder.
+
+# need to set this current file
+current_calib_file = '../WorldTransFRIDA/Data/Calibration Data.csv'
+
 load_dotenv()
+
+datadir = os.getenv("datadir")
 
 climate_start = int(os.getenv("climate_start"))
 climate_end = int(os.getenv("climate_end"))
@@ -11,13 +21,13 @@ climate_end = int(os.getenv("climate_end"))
 frida_start = int(os.getenv("frida_start"))
 frida_calib_end = int(os.getenv("frida_calib_end"))
 
-df_frida_current = pd.read_csv('../WorldTransFRIDA/Data/Calibration Data.csv', index_col=0)
+df_frida_current = pd.read_csv(current_calib_file, index_col=0)
 
 df_frida_current = df_frida_current.T
 
 df_frida_new = copy.deepcopy(df_frida_current)
 
-df_frida_calib_inputs = pd.read_csv("data/outputs/frida_calibration_data.csv")
+df_frida_calib_inputs = pd.read_csv(f"{datadir}/outputs/frida_calibration_data.csv")
 df_frida_calib_inputs = df_frida_calib_inputs.set_index("Year")
 
 df_frida_calib_inputs['Emissions.Total CH4 Emissions[1]'] = df_frida_calib_inputs[
@@ -133,7 +143,7 @@ for var in vars_for_frida:
 
 #%%
 
-df_forc = pd.read_csv('data/inputs/ERF_best_1750-2023.csv', index_col=0)
+df_forc = pd.read_csv(f'{datadir}/inputs/ERF_best_1750-2023.csv', index_col=0)
 
 forcing_vars = ['CO2 Forcing.CO2 Effective Radiative Forcing[1]', 
                 'CH4 Forcing.CH4 Effective Radiative Forcing[1]', 
@@ -156,9 +166,9 @@ for var in forcing_vars:
     df_frida_new[var]['Units'] = 'w/m^2'
     df_frida_new[var]['Reference'] = 'https://github.com/ClimateIndicator/forcing-timeseries/blob/main/output/ERF_best_1750-2023.csv'
 
-            #%%
+    
 
-df_conc = pd.read_csv('data/inputs/ghg_concentrations_1750-2023.csv', index_col=0)
+df_conc = pd.read_csv(f'{datadir}/inputs/ghg_concentrations_1750-2023.csv', index_col=0)
 
 conc_vars = {
     'CO2 Forcing.Atmospheric CO2 Concentration[1]':'ppm',
@@ -184,9 +194,8 @@ for var in conc_vars.keys():
     df_frida_new[var]['Reference'] = 'https://github.com/ClimateIndicator/forcing-timeseries/blob/main/output/ghg_concentrations_1750-2023.csv'
 
   
-#%%
 
-df_gmst = pd.read_csv('data/inputs/annual_averages.csv', index_col=0)
+df_gmst = pd.read_csv(f'{datadir}/inputs/annual_averages.csv', index_col=0)
    
 var = 'Energy Balance Model.Surface Temperature Anomaly[1]'
 df_var = 'gmst'
@@ -201,10 +210,10 @@ for idx in df_frida_calib_inputs.index:
         df_frida_new.loc[str(idx), var] = df_gmst[df_var][idx+0.5]
 
 df_frida_new[var]['Units'] = 'deg C'
-df_frida_new[var]['Reference'] = ''
+df_frida_new[var]['Reference'] = 'https://github.com/ClimateIndicator/data/blob/main/data/global_mean_temperatures/annual_averages.csv'
 
 
 #%%
        
 df_frida_new = df_frida_new.T
-df_frida_new.to_csv('data/outputs/Calibration Data new.csv')
+df_frida_new.to_csv(f'{datadir}/outputs/Calibration Data new.csv')

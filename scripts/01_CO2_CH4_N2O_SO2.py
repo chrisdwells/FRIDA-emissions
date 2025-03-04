@@ -15,6 +15,8 @@ load_dotenv()
 # Get Emissions from various sources, by species. Use Indicators for 1750 concs 
 # where needed in FRIDA.
 
+datadir = os.getenv("datadir")
+
 climate_start = int(os.getenv("climate_start"))
 climate_end = int(os.getenv("climate_end"))
 
@@ -54,7 +56,7 @@ tgch4_to_mtch4 = 1 # GFED
 
 ktso2_to_mtso2 = 0.001 # ceds
 
-df_indicators = pd.read_csv('data/inputs/ghg_concentrations_1750-2023.csv', index_col=0)
+df_indicators = pd.read_csv(f'{datadir}/inputs/ghg_concentrations_1750-2023.csv', index_col=0)
 
 
 #%%
@@ -82,7 +84,7 @@ Output in MtCO2. Inputs vary between sheets.
 
 # Total budget for calibration
 df_gcb_budget = pd.read_csv(
-    "data/inputs/Global_Carbon_Budget_2024_v1.0_historical_budget.csv")
+    f"{datadir}/inputs/Global_Carbon_Budget_2024_v1.0_historical_budget.csv")
 
 df_gcb_budget_crop = df_gcb_budget.loc[(df_gcb_budget['Year'] >= climate_start
                                     ) & (df_gcb_budget['Year'] <= climate_end)]
@@ -108,7 +110,7 @@ df_climate['Emissions.CO2 Emissions from Food and Land Use'] = gtc_to_mtco2*land
 
 # By sector for FRIDA
 df_gcb_by_cat = pd.read_csv(
-    "data/inputs/Global_Carbon_Budget_2024_v1.0_fossil_emissions_by_category.csv")
+    f"{datadir}/inputs/Global_Carbon_Budget_2024_v1.0_fossil_emissions_by_category.csv")
 
 df_gcb_by_cat_crop = df_gcb_by_cat.loc[(df_gcb_by_cat['Year'] >= frida_start
                                     ) & (df_gcb_by_cat['Year'] <= frida_calib_end)]
@@ -148,7 +150,7 @@ representation in FRIDA.
 """
 
 df_primap = pd.read_csv(
-    "data/inputs/Guetschow_et_al_2024a-PRIMAP-hist_v2.6_final_no_rounding_13-Sep-2024.csv")
+    f"{datadir}/inputs/Guetschow_et_al_2024a-PRIMAP-hist_v2.6_final_no_rounding_13-Sep-2024.csv")
 
 df_primap_crop = df_primap.loc[(df_primap['area (ISO3)'] == 'EARTH') &
                                (df_primap['scenario (PRIMAP-hist)'] == 'HISTTP')]
@@ -196,7 +198,7 @@ df_climate['Emissions.N2O non AFOLU Emissions'] = ggn2o_to_ktn2o*(df_primap_n2o_
 # BB GFED
 
 df_gfed_n2o = pd.read_csv(
-    "data/inputs/N2O_BB4CMIP.csv")
+    f"{datadir}/inputs/N2O_BB4CMIP.csv")
 
 df_gfed_n2o_crop = df_gfed_n2o.loc[df_gfed_n2o['region'] == 'World'
              ].drop(['model', 'scenario', 'unit', 'variable', 'region'], 
@@ -272,7 +274,7 @@ representation in FRIDA.
 """
 
 df_ch4_ceds = pd.read_csv(
-    "data/inputs/CH4_CEDS_global_emissions_by_sector_v2024_07_08.csv")
+    f"{datadir}/inputs/CH4_CEDS_global_emissions_by_sector_v2024_07_08.csv")
 
 ceds_to_frida_ch4 = {
     "1A1a_Electricity-autoproducer":"Energy",
@@ -392,7 +394,7 @@ ch4_agri_pre_1997 = (
 ch4_gfed_pre_1997 = ch4_afolu_pre_1997 - ch4_agri_pre_1997
 
 df_gfed = pd.read_csv(
-    "data/inputs/gfed4.1s_1997-2023.csv")
+    f"{datadir}/inputs/gfed4.1s_1997-2023.csv")
 
 ch4_gfed_1997_plus = df_gfed['CH4'].loc[
             df_gfed['Unnamed: 0'] <= climate_end].values*tgch4_to_mtch4
@@ -457,7 +459,7 @@ ensure forcing is 0 in 1750.
 """
 
 df_so2_ceds = pd.read_csv(
-    "data/inputs/SO2_CEDS_global_emissions_by_sector_v2024_07_08.csv")
+    f"{datadir}/inputs/SO2_CEDS_global_emissions_by_sector_v2024_07_08.csv")
 
 df_so2_ceds_crop = df_so2_ceds.drop(['em', 'units'], 
                axis=1).set_index('sector').transpose()
@@ -536,6 +538,6 @@ for spec in ['CO2', 'N2O', 'CH4', 'SO2']:
 
 #%%
 
-df_frida.to_csv('data/outputs/frida_calibration_data.csv')
-df_climate.to_csv('data/outputs/climate_calibration_data.csv')
-df_frida_baselines.to_csv('data/outputs/baseline_values.csv')
+df_frida.to_csv(f'{datadir}/outputs/frida_calibration_data.csv')
+df_climate.to_csv(f'{datadir}/outputs/climate_calibration_data.csv')
+df_frida_baselines.to_csv(f'{datadir}/outputs/baseline_values.csv')

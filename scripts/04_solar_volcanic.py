@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
-# import matplotlib.pyplot as plt
 import pooch
-# import pickle
 from dotenv import load_dotenv
 import os
 
@@ -11,6 +9,8 @@ load_dotenv()
 # This makes the natural forcing timeseries; uses updated values to 2025, then
 # CMIP6 approach after.
 
+datadir = os.getenv("datadir")
+
 climate_start = int(os.getenv("climate_start"))
 climate_end = int(os.getenv("climate_end"))
 
@@ -18,11 +18,11 @@ frida_start = int(os.getenv("frida_start"))
 frida_end = int(os.getenv("frida_end"))
 
 df_frida = pd.read_csv(
-    "data/outputs/frida_input_data.csv")
+    f"{datadir}/outputs/frida_input_data.csv")
 df_frida = df_frida.set_index('Year')
 
 df_climate = pd.read_csv(
-    "data/outputs/climate_calibration_data.csv")
+    f"{datadir}/outputs/climate_calibration_data.csv")
 df_climate = df_climate.set_index('Year')
 
 #%%
@@ -56,7 +56,7 @@ forc_in = (
 #%%
 
 df_forcings = pd.read_csv(
-    "data/inputs/volcanic_solar.csv")
+    f"{datadir}/inputs/volcanic_solar.csv")
 
 df_volc = df_forcings.loc[(df_forcings['Scenario'] == 'ssp245') & (df_forcings['Variable'] == 'Volcanic')].drop(['Scenario', 'Region', 'Unit', 'Variable'], axis=1).transpose()
 df_volc.index = df_volc.index.astype(int)
@@ -88,8 +88,8 @@ df_climate['Natural Forcing.Baseline Effective Radiative Forcing from Volcanoes'
 
 #%%
 
-df_frida.to_csv('data/outputs/frida_input_data.csv')
-df_climate.to_csv('data/outputs/climate_calibration_data.csv')
+df_frida.to_csv(f'{datadir}/outputs/frida_input_data.csv')
+df_climate.to_csv(f'{datadir}/outputs/climate_calibration_data.csv')
 
 
 #%%

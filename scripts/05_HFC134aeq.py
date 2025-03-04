@@ -9,6 +9,8 @@ load_dotenv()
 # This makes the emissions that drive the climate calibration, and are used
 # for the FRIDA calibration - since these emissions are modelled.
 
+datadir = os.getenv("datadir")
+
 climate_start = int(os.getenv("climate_start"))
 climate_end = int(os.getenv("climate_end"))
 
@@ -18,7 +20,7 @@ frida_calib_end = int(os.getenv("frida_calib_end"))
 years = np.arange(climate_start, climate_end+1)
 
 # get IGCC GHGS
-df = pd.read_csv('data/inputs/ghg_concentrations_1750-2023.csv', index_col=0)
+df = pd.read_csv(f'{datadir}/inputs/ghg_concentrations_1750-2023.csv', index_col=0)
 
 f_gases = ['CF4', 'C2F6', 'C3F8', 'c-C4F8', 'n-C4F10', 'n-C5F12',
        'n-C6F14', 'i-C6F14', 'C7F16', 'C8F18', 'NF3', 'SF6', 'SO2F2', 'HFC-125',
@@ -124,21 +126,21 @@ for i in range(1, climate_end - climate_start + 1):
 #%%
 
 df_calib = pd.read_csv(
-    "data/outputs/climate_calibration_data.csv")
+    f"{datadir}/outputs/climate_calibration_data.csv")
 df_calib['Emissions.HFC134a eq Emissions'] = anthro_ems
 
 df_frida_baselines = pd.read_csv(
-    "data/outputs/baseline_values.csv")
+    f"{datadir}/outputs/baseline_values.csv")
 df_frida_baselines['Minor GHGs Forcing.Atmospheric HFC134a eq Concentration 1750'
                ] = hfc134a_eq[0]
 
 
 df_frida_calib = pd.read_csv(
-    "data/outputs/frida_calibration_data.csv")
+    f"{datadir}/outputs/frida_calibration_data.csv")
 df_frida_calib['Emissions.HFC134a eq Emissions[1]'] = anthro_ems[np.where((years >= frida_start) 
                                                    & (years <= frida_calib_end))]
 
-df_calib.to_csv('data/outputs/climate_calibration_data.csv')
-df_frida_baselines.to_csv('data/outputs/baseline_values.csv')
-df_frida_calib.to_csv('data/outputs/frida_calibration_data.csv')
+df_calib.to_csv(f'{datadir}/outputs/climate_calibration_data.csv')
+df_frida_baselines.to_csv(f'{datadir}/outputs/baseline_values.csv')
+df_frida_calib.to_csv(f'{datadir}/outputs/frida_calibration_data.csv')
 

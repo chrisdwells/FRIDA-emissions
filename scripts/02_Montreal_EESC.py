@@ -10,7 +10,9 @@ import os
 load_dotenv()
 
 # This generates the exogenous timeseries of Montreal gas ERF and EESC effect -
-# from 1750 to 2022 for the climate calib, and 1980-2130 for FRIDA.
+# from 1750 to 2022 for the climate calib, and 1980-2150 for FRIDA.
+
+datadir = os.getenv("datadir")
 
 climate_start = int(os.getenv("climate_start"))
 climate_end = int(os.getenv("climate_end"))
@@ -21,7 +23,7 @@ frida_end = int(os.getenv("frida_end"))
 # load in data, say which species to change
 
 df_hist_concs = pd.read_csv(
-    "data/inputs/ghg_concentrations_1750-2023.csv")
+    f"{datadir}/inputs/ghg_concentrations_1750-2023.csv")
 
 df_hist_concs = df_hist_concs.set_index("YYYY")
 
@@ -111,7 +113,7 @@ f_new_hist.run()
 
 f_ssps = FAIR()
 
-f_ssps.define_time(1750, 2130, 1)
+f_ssps.define_time(1750, frida_end, 1)
 
 scenarios = ['ssp119', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
 f_ssps.define_scenarios(scenarios)
@@ -230,10 +232,10 @@ plt.title('EESC conc')
 #%%
 
 # add them to the climate calib data, i.e. 1750-2022 (which exists from the 
-# other species), and to the FRIDA input data, i.e. 1980-2130 (which is new here)
+# other species), and to the FRIDA input data, i.e. 1980-2150 (which is new here)
 
 df_calib = pd.read_csv(
-    "data/outputs/climate_calibration_data.csv")
+    f"{datadir}/outputs/climate_calibration_data.csv")
 
 df_calib['Minor GHGs Forcing.Montreal Gases Effective Radiative Forcing'
          ] = montreal_forcing_hist_future_new[np.where(f_ssps.timebounds<=climate_end)]
@@ -241,7 +243,7 @@ df_calib['Minor GHGs Forcing.Montreal Gases Effective Radiative Forcing'
 df_calib['Ozone Forcing.Montreal gases equivalent effective stratospheric chlorine'
          ] = eesc_hist_future_new[np.where(f_ssps.timebounds<=climate_end)]
 
-df_calib.to_csv('data/outputs/climate_calibration_data.csv')
+df_calib.to_csv(f'{datadir}/outputs/climate_calibration_data.csv')
 
 
 df_frida_inputs = pd.DataFrame()
@@ -255,15 +257,15 @@ df_frida_inputs['Ozone Forcing.Montreal gases equivalent effective stratospheric
          ] = eesc_hist_future_new[np.where((f_ssps.timebounds>=frida_start) & (f_ssps.timebounds<=frida_end))]
 
 
-df_frida_inputs.to_csv('data/outputs/frida_input_data.csv')
+df_frida_inputs.to_csv(f'{datadir}/outputs/frida_input_data.csv')
 
 
 
 df_frida_baselines = pd.read_csv(
-    "data/outputs/baseline_values.csv")
+    f"{datadir}/outputs/baseline_values.csv")
 
 df_frida_baselines['Ozone Forcing.Montreal gases equivalent effective stratospheric chlorine 1750'
            ] = eesc_conc_cmip6_hist[np.where(f_cmip6_hist.timebounds==1750)].values[0]
 
-df_frida_baselines.to_csv('data/outputs/baseline_values.csv')
+df_frida_baselines.to_csv(f'{datadir}/outputs/baseline_values.csv')
 

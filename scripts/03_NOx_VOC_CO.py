@@ -1,9 +1,6 @@
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-# import pooch
-# import pickle
 from fair import FAIR
 from fair.io import read_properties
 from fair.interface import fill, initialise
@@ -15,6 +12,8 @@ load_dotenv()
 
 # This makes the NOx, VOC, CO timeseries used for the FRIDA calibration. CEDS + GFED.
 # It also makes the regression coefficients used in both. 
+
+datadir = os.getenv("datadir")
 
 climate_start = int(os.getenv("climate_start"))
 climate_end = int(os.getenv("climate_end"))
@@ -28,11 +27,11 @@ ktnox_to_mtnox = 0.001 #ceds
 ktbc_to_mtbc = 0.001 #ceds
 
 df_frida_calib = pd.read_csv(
-    "data/outputs/frida_calibration_data.csv")
+    f"{datadir}/outputs/frida_calibration_data.csv")
 df_frida_calib = df_frida_calib.set_index('Year')
 
 df_frida_baselines = pd.read_csv(
-    "data/outputs/baseline_values.csv")
+    f"{datadir}/outputs/baseline_values.csv")
 df_frida_baselines = df_frida_baselines.set_index('Year')
 
 regression_data =  pd.DataFrame()
@@ -42,7 +41,7 @@ regression_data = regression_data.set_index('Year')
 #%%
 
 df_gfed_full = pd.read_csv(
-    "data/inputs/gfed-bb4cmip_cmip7_national_alpha.csv")
+    f"{datadir}/inputs/gfed-bb4cmip_cmip7_national_alpha.csv")
 
 df_gfed_full = df_gfed_full.loc[df_gfed_full['region'] == 'World'
                                 ].drop(['model', 'scenario', 'region', 'unit'], axis=1
@@ -53,7 +52,7 @@ df_gfed_full.index = [int(idx) for idx in df_gfed_full.index]
 #%%
 
 df_co_ceds = pd.read_csv(
-    "data/inputs/CO_CEDS_global_emissions_by_sector_v2024_07_08.csv")
+    f"{datadir}/inputs/CO_CEDS_global_emissions_by_sector_v2024_07_08.csv")
 
 df_co_ceds_crop = df_co_ceds.drop(['em', 'units'], 
                axis=1).set_index('sector').transpose()
@@ -83,7 +82,7 @@ df_frida_baselines['Emissions.Baseline CO Emissions'] = regression_data.loc[
 #%%
 
 df_voc_ceds = pd.read_csv(
-    "data/inputs/NMVOC_CEDS_global_emissions_by_sector_v2024_07_08.csv")
+    f"{datadir}/inputs/NMVOC_CEDS_global_emissions_by_sector_v2024_07_08.csv")
 
 df_voc_ceds_crop = df_voc_ceds.drop(['em', 'units'], 
                axis=1).set_index('sector').transpose()
@@ -179,7 +178,7 @@ ceds_to_frida_nox = {
     }
 
 df_nox_ceds = pd.read_csv(
-    "data/inputs/NOx_CEDS_global_emissions_by_sector_v2024_07_08.csv")
+    f"{datadir}/inputs/NOx_CEDS_global_emissions_by_sector_v2024_07_08.csv")
 
 df_nox_ceds_crop = df_nox_ceds.drop(['em', 'units'], 
                axis=1).set_index('sector').transpose()
@@ -262,16 +261,16 @@ for spec in spec_plots:
 #%%
 
 
-df_frida_calib.to_csv('data/outputs/frida_calibration_data.csv')
+df_frida_calib.to_csv(f'{datadir}/outputs/frida_calibration_data.csv')
 
-df_frida_baselines.to_csv('data/outputs/baseline_values.csv')
+df_frida_baselines.to_csv(f'{datadir}/outputs/baseline_values.csv')
 
 
 #%%
 
 # To update BC Snow forcing output, for the regression
 df_bc_ceds = pd.read_csv(
-    "data/inputs/BC_CEDS_global_emissions_by_sector_v2024_07_08.csv")
+    f"{datadir}/inputs/BC_CEDS_global_emissions_by_sector_v2024_07_08.csv")
 
 df_bc_ceds_crop = df_bc_ceds.drop(['em', 'units'], 
                axis=1).set_index('sector').transpose()
@@ -334,7 +333,7 @@ regression_data['BC Snow Forcing'] = f_cmip6_hist.forcing[
 #%%
 
 df_climate_calib = pd.read_csv(
-    "data/outputs/climate_calibration_data.csv")
+    f"{datadir}/outputs/climate_calibration_data.csv")
 df_climate_calib = df_climate_calib.set_index("Year")
 
 regression_data['CO2 AFOLU Emissions'] = df_climate_calib[
@@ -419,4 +418,4 @@ regression_parameters['Emissions.NOx AFOLU Emissions per SO2 Emissions'
 regression_parameters['Emissions.NOx non AFOLU Emissions per N2O non AFOLU Emissions'
                       ] = regr_data['NOx non AFOLU Emissions'][0]
 
-regression_parameters.to_csv('data/outputs/regression_parameters.csv')
+regression_parameters.to_csv(f'{datadir}/outputs/regression_parameters.csv')
