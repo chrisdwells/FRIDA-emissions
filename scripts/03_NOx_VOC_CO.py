@@ -220,7 +220,7 @@ df_frida_baselines['Emissions.Baseline NOx non AFOLU Emissions'] = regression_da
 
 #%%
 df_old_calib = pd.read_csv(
-    "../WorldTransFRIDA/Data/Calibration Data.csv")
+    "../../WorldTransFRIDA/Data/Calibration Data.csv")
 
 
 spec_plots = ['Emissions.CO Emissions[1]', 'Emissions.VOC Emissions[1]',
@@ -365,8 +365,19 @@ potential_links = {
     'NOx AFOLU Emissions':['Sulfur Emissions'],
     }
 
+units = {
+    'BC Snow Forcing':r'W m$^{-2}$',
+    'VOC Emissions':r'Mt VOC yr$^{-1}$',
+    'CO Emissions':r'Mt CO yr$^{-1}$',
+    'NOx non AFOLU Emissions':r'Mt NOx yr$^{-1}$',
+    'NOx AFOLU Emissions':r'Mt NOx yr$^{-1}$',
+    }
 
-for targ in potential_links.keys():
+
+fig, axs = plt.subplots(2, 3, figsize=(12, 6))
+axs = axs.ravel()
+
+for t_i, targ in enumerate(potential_links.keys()):
     regr_data[targ] = {}
     
     pred = potential_links[targ]
@@ -384,14 +395,25 @@ for targ in potential_links.keys():
     
     regr_data[targ] = regr.coef_
     
-    fig = plt.figure()
     
-    plt.plot(np.arange(climate_start, climate_end+1), regression_data[targ].values, label='Target')
-    plt.plot(np.arange(climate_start, climate_end+1), regression_data[targ].values[0
+    
+    axs[t_i].plot(np.arange(climate_start, climate_end+1), regression_data[targ].values, label='Target')
+    axs[t_i].plot(np.arange(climate_start, climate_end+1), regression_data[targ].values[0
                ] + regr.predict(pred_array), label='Fit')
 
-    plt.legend()
-    plt.title(targ)
+    axs[t_i].set_title(targ)
+    axs[t_i].set_ylabel(f'{units[targ]}')
+
+axs[0].legend()
+axs[5].set_visible(False)
+
+
+plt.tight_layout()
+plt.savefig(
+    "../figures/for_paper/S1_regressions.png"
+)
+
+
     
 #%%
 
